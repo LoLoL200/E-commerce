@@ -1,0 +1,153 @@
+# Swagger documentation for Order Handler
+# English comments for development consistency
+
+  # --- ORDER ENDPOINTS ---
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Создать заказ из корзины
+      description: Создает новый заказ, используя все товары, которые сейчас находятся в корзине пользователя.
+      operationId: createOrder
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Заказ успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          description: Не авторизован
+        '500':
+          description: Ошибка при создании заказа
+
+    get:
+      tags:
+        - orders
+      summary: Список моих заказов
+      description: Возвращает список всех заказов авторизованного пользователя.
+      operationId: listMyOrders
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список заказов получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        '401':
+          description: Не авторизован
+
+  /orders/{id}:
+    get:
+      tags:
+        - orders
+      summary: Детали конкретного заказа
+      description: Возвращает подробную информацию о заказе по его UUID.
+      operationId: getOrderDetails
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID заказа
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Детали заказа получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Заказ не найден
+
+  /orders/{id}/cancel:
+    put:
+      tags:
+        - orders
+      summary: Отмена заказа
+      description: Устанавливает статус заказа на "cancelled" (отменен).
+      operationId: cancelOrder
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID заказа для отмены
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Заказ успешно отменен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "cancelled"
+
+components:
+  # ... (Previous securitySchemes stay here)
+
+  schemas:
+    # ... (Auth and Cart schemas stay here)
+
+    # Order Data Model
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          example: "pending"
+        total_amount:
+          type: number
+          format: float
+          example: 299.99
+        shipping_address:
+          type: string
+          example: "{}"
+        payment_method:
+          type: string
+          example: "card"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # Order Item Model
+    OrderItem:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+        price:
+          type: number
+          format: float

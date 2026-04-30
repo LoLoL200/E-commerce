@@ -1,0 +1,183 @@
+# Swagger documentation for Authentication Handler
+openapi: 3.0.3
+info:
+  title: E-commerce API Аутентификация
+  description: API для регистрации пользователей, входа и управления токенами доступа.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Main server (v1 prefix)
+
+# API tags grouping
+tags:
+  - name: auth
+    description: Authentication operations
+
+paths:
+  # User registration endpoint
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Регистрация нового пользователя
+      description: Создает новую учетную запись пользователя.
+      operationId: registerUser
+      requestBody:
+        description: Registration data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Пользователь уже существует
+
+  # User login endpoint
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Вход в систему
+      description: Аутентификация пользователя и выдача токенов.
+      operationId: loginUser
+      requestBody:
+        description: User credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Неверные учетные данные
+
+  # Token refresh endpoint
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Обновление токена доступа
+      description: Получение нового Access токена.
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Токен обновлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+
+  # Logout endpoint
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Выход из системы
+      description: Завершение сессии.
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Успешный выход
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+# Data models
+components:
+  schemas:
+    # Model for user registration
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    # Model for login
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    # Model for token refresh
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+
+    # Combined tokens response
+    AuthResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+
+    # Standard success response
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Logged out successfully"
+
+    # Standard error response structure
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Internal server error"
+        status:
+          type: integer
+          example: 500

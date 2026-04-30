@@ -1,0 +1,163 @@
+# Swagger documentation for Product Handler
+# English comments for technical reference
+
+  # --- PRODUCT ENDPOINTS ---
+  /products:
+    get:
+      tags:
+        - products
+      summary: Список всех товаров
+      description: Получение списка товаров с поддержкой пагинации, фильтрации по категории и поиску.
+      operationId: listProducts
+      parameters:
+        - name: search
+          in: query
+          description: Поиск по названию или описанию
+          schema:
+            type: string
+        - name: order_by
+          in: query
+          description: Сортировка (например, price_asc, price_desc, name)
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Количество товаров (по умолчанию 30)
+          schema:
+            type: integer
+            default: 30
+        - name: offset
+          in: query
+          description: Смещение для пагинации
+          schema:
+            type: integer
+            default: 0
+        - name: category_id
+          in: query
+          description: UUID категории для фильтрации
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Успешное получение списка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '400':
+          description: Некорректные параметры запроса
+
+  /products/{id}:
+    get:
+      tags:
+        - products
+      summary: Детали товара
+      description: Получение полной информации о товаре по его UUID.
+      operationId: getProductDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID товара
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация о товаре получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Товар не найден
+
+  /products/search:
+    get:
+      tags:
+        - products
+      summary: Поиск товаров
+      description: Специализированный эндпоинт для поиска (требует обязательный параметр search).
+      operationId: searchProducts
+      parameters:
+        - name: search
+          in: query
+          required: true
+          description: Строка поиска
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Результаты поиска
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+  /products/categories:
+    get:
+      tags:
+        - products
+      summary: Товары по категориям
+      description: Возвращает товары, принадлежащие конкретной категории.
+      operationId: listByCategory
+      parameters:
+        - name: category
+          in: query
+          required: true
+          description: UUID категории
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список товаров в категории
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+
+components:
+# ... (Previous securitySchemes and schemas stay here)
+
+  schemas:
+    # Product Data Model
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        quantity:
+          type: integer
+        category_id:
+          type: string
+          format: uuid
+        image_url:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    # Paginated Response Model (matches ProductListResponse in your Go code)
+    ProductListResponse:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer

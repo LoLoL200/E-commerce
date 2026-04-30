@@ -1,0 +1,164 @@
+# Swagger documentation for Cart Handler
+# English comments for technical reference
+
+  # --- CART ENDPOINTS ---
+  /cart:
+    get:
+      tags:
+        - cart
+      summary: Получить корзину пользователя
+      description: Возвращает список всех товаров в корзине текущего авторизованного пользователя.
+      operationId: getCart
+      security:
+        - BearerAuth: [] # Requires JWT token
+      responses:
+        '200':
+          description: Корзина успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cart'
+        '401':
+          description: Не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags:
+        - cart
+      summary: Очистить корзину
+      description: Полностью удаляет все товары из корзины пользователя.
+      operationId: clearCart
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Корзина успешно очищена
+
+  /cart/items:
+    post:
+      tags:
+        - cart
+      summary: Добавить товар в корзину
+      description: Добавляет товар или увеличивает количество, если товар уже в корзине.
+      operationId: addItemToCart
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '201':
+          description: Товар добавлен
+        '400':
+          description: Ошибка в данных запроса
+
+  /cart/items/{id}:
+    put:
+      tags:
+        - cart
+      summary: Обновить количество товара
+      description: Изменяет количество конкретной позиции в корзине.
+      operationId: updateCartItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID позиции в корзине
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  example: 5
+      responses:
+        '200':
+          description: Количество обновлено
+
+    delete:
+      tags:
+        - cart
+      summary: Удалить товар из корзины
+      description: Удаляет одну конкретную позицию из корзины по ID.
+      operationId: removeCartItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID позиции в корзине
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Товар удален
+
+components:
+  # JWT Security Definition
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Cart Response Model
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+
+    # Individual Item in Cart
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+        price:
+          type: number
+          format: float
+
+    # Payload for adding items
+    AddToCartRequest:
+      type: object
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
