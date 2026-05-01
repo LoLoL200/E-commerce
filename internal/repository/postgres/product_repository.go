@@ -176,36 +176,6 @@ func (p *productRepo) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 
 // ListProduct
 func (p *productRepo) ListProduct(ctx context.Context, limit, offset int) ([]*models.Product, error) {
-	// query := `
-	//     SELECT id, name, description, price, quantity, category
-	//     FROM products
-	//     ORDER BY name
-	//     LIMIT $1 OFFSET $2`
-
-	// rows, err := p.db.QueryContext(ctx, query, limit, offset)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("list products error: %w", err)
-	// }
-	// defer rows.Close()
-
-	// var products []*models.Product
-	// for rows.Next() {
-	// 	product := &models.Product{}
-	// 	err := rows.Scan(
-	// 		&product.ID,
-	// 		&product.Name,
-	// 		&product.Description,
-	// 		&product.Price,
-	// 		&product.Quantity,
-	// 		&product.CategoryID,
-	// 	)
-	// 	if err != nil {
-	// 		return nil, fmt.Errorf("scan product error: %w", err)
-	// 	}
-	// 	products = append(products, product)
-	// }
-	// return products, nil
-	// В SQL используем stock и category_id
 	query := `
         SELECT id, name, description, price, stock, category_id 
         FROM products

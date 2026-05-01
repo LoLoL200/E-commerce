@@ -1,47 +1,46 @@
-# Swagger documentation for Cart Handler
-# English comments for technical reference
+openapi: 3.0.0
+info:
+  title: E-commerce API Кошика
+  version: 1.0.0
 
-  # --- CART ENDPOINTS ---
+# Базовий шлях (якщо у вашому коді на Go встановлено префікс /cart)
+servers:
+  - url: /api/v1
+    description: Основний сервер
+
+paths:
   /cart:
     get:
       tags:
-        - cart
-      summary: Получить корзину пользователя
-      description: Возвращает список всех товаров в корзине текущего авторизованного пользователя.
-      operationId: getCart
+        - кошик
+      summary: Отримати кошик користувача
       security:
-        - BearerAuth: [] # Requires JWT token
+        - BearerAuth: []
       responses:
         '200':
-          description: Корзина успешно получена
+          description: Успішно отримано
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Cart'
         '401':
-          description: Не авторизован
-        '500':
-          description: Внутренняя ошибка сервера
+          $ref: '#/components/responses/Unauthorized'
 
     delete:
       tags:
-        - cart
-      summary: Очистить корзину
-      description: Полностью удаляет все товары из корзины пользователя.
-      operationId: clearCart
+        - кошик
+      summary: Очистити кошик
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: Корзина успешно очищена
+          description: Кошик успішно очищено
 
   /cart/items:
     post:
       tags:
-        - cart
-      summary: Добавить товар в корзину
-      description: Добавляет товар или увеличивает количество, если товар уже в корзине.
-      operationId: addItemToCart
+        - кошик
+      summary: Додати товар у кошик
       security:
         - BearerAuth: []
       requestBody:
@@ -52,24 +51,20 @@
               $ref: '#/components/schemas/AddToCartRequest'
       responses:
         '201':
-          description: Товар добавлен
+          description: Товар додано
         '400':
-          description: Ошибка в данных запроса
+          description: Помилка валідації
 
   /cart/items/{id}:
     put:
       tags:
-        - cart
-      summary: Обновить количество товара
-      description: Изменяет количество конкретной позиции в корзине.
-      operationId: updateCartItem
-      security:
-        - BearerAuth: []
+        - кошик
+      summary: Оновити кількість товару
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID позиции в корзине
+          description: UUID елемента кошика
           schema:
             type: string
             format: uuid
@@ -83,72 +78,65 @@
                 quantity:
                   type: integer
                   minimum: 1
-                  example: 5
+                  description: Нова кількість товару
       responses:
         '200':
-          description: Количество обновлено
-
-    delete:
-      tags:
-        - cart
-      summary: Удалить товар из корзины
-      description: Удаляет одну конкретную позицию из корзины по ID.
-      operationId: removeCartItem
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: UUID позиции в корзине
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Товар удален
+          description: Кількість оновлено
 
 components:
-  # JWT Security Definition
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
 
+  responses:
+    Unauthorized:
+      description: Помилка авторизації
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
   schemas:
-    # Cart Response Model
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Опис помилки
+
     Cart:
       type: object
       properties:
         id:
           type: string
           format: uuid
-        user_id:
-          type: string
-          format: uuid
+          description: UUID кошика
         items:
           type: array
           items:
             $ref: '#/components/schemas/CartItem'
+          description: Список товарів у кошику
 
-    # Individual Item in Cart
     CartItem:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          description: Унікальний ідентифікатор запису в кошику
         product_id:
           type: string
           format: uuid
+          description: ID товару
         quantity:
           type: integer
+          description: Кількість
         price:
           type: number
-          format: float
+          description: Ціна за одиницю товару
 
-    # Payload for adding items
     AddToCartRequest:
       type: object
       required:
@@ -158,7 +146,9 @@ components:
         product_id:
           type: string
           format: uuid
+          description: ID товару, який потрібно додати
         quantity:
           type: integer
           minimum: 1
           example: 2
+          description: Кількість товару

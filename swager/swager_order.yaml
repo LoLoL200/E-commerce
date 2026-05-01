@@ -1,95 +1,90 @@
-# Swagger documentation for Order Handler
-# English comments for development consistency
+openapi: 3.0.0
+info:
+  title: E-commerce API
+  version: 1.0.0
 
-  # --- ORDER ENDPOINTS ---
+paths:
+  # --- ЕНДПОЇНТИ ЗАМОВЛЕНЬ ---
   /orders:
     post:
       tags:
-        - orders
-      summary: Создать заказ из корзины
-      description: Создает новый заказ, используя все товары, которые сейчас находятся в корзине пользователя.
+        - замовлення
+      summary: Створити замовлення з кошика
       operationId: createOrder
       security:
         - BearerAuth: []
       responses:
         '201':
-          description: Заказ успешно создан
+          description: Замовлення успішно створено
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '401':
-          description: Не авторизован
+          $ref: '#/components/responses/Unauthorized'
         '500':
-          description: Ошибка при создании заказа
+          description: Помилка сервера
 
     get:
       tags:
-        - orders
-      summary: Список моих заказов
-      description: Возвращает список всех заказов авторизованного пользователя.
+        - замовлення
+      summary: Список моїх замовлень
       operationId: listMyOrders
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: Список заказов получен
+          description: Список замовлень отримано
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Order'
-        '401':
-          description: Не авторизован
 
   /orders/{id}:
     get:
       tags:
-        - orders
-      summary: Детали конкретного заказа
-      description: Возвращает подробную информацию о заказе по его UUID.
-      operationId: getOrderDetails
-      security:
-        - BearerAuth: []
+        - замовлення
+      summary: Деталі конкретного замовлення
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID заказа
+          description: UUID замовлення
           schema:
             type: string
             format: uuid
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Детали заказа получены
+          description: Деталі отримано
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
         '404':
-          description: Заказ не найден
+          description: Замовлення не знайдено
 
   /orders/{id}/cancel:
     put:
       tags:
-        - orders
-      summary: Отмена заказа
-      description: Устанавливает статус заказа на "cancelled" (отменен).
-      operationId: cancelOrder
-      security:
-        - BearerAuth: []
+        - замовлення
+      summary: Скасування замовлення
       parameters:
         - name: id
           in: path
           required: true
-          description: UUID заказа для отмены
+          description: UUID замовлення
           schema:
             type: string
             format: uuid
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Заказ успешно отменен
+          description: Успішно скасовано
           content:
             application/json:
               schema:
@@ -100,34 +95,49 @@
                     example: "cancelled"
 
 components:
-  # ... (Previous securitySchemes stay here)
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Не авторизовано
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "unauthorized"
 
   schemas:
-    # ... (Auth and Cart schemas stay here)
-
-    # Order Data Model
     Order:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          description: Унікальний ідентифікатор замовлення
         user_id:
           type: string
           format: uuid
+          description: ID користувача
         status:
           type: string
+          enum: [pending, paid, shipped, cancelled]
+          description: Статус замовлення (очікується, оплачено, відправлено, скасовано)
           example: "pending"
         total_amount:
           type: number
           format: float
+          description: Загальна сума
           example: 299.99
         shipping_address:
           type: string
-          example: "{}"
-        payment_method:
-          type: string
-          example: "card"
+          description: Адреса доставки
         items:
           type: array
           items:
@@ -135,19 +145,21 @@ components:
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
+          description: Дата створення
 
-    # Order Item Model
     OrderItem:
       type: object
       properties:
         product_id:
           type: string
           format: uuid
+          description: ID товару
         quantity:
           type: integer
+          description: Кількість
+          example: 1
         price:
           type: number
           format: float
+          description: Ціна за одиницю
+          example: 99.99

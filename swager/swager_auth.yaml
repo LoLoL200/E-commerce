@@ -1,29 +1,29 @@
-# Swagger documentation for Authentication Handler
+# Документація Swagger для обробника автентифікації
 openapi: 3.0.3
 info:
-  title: E-commerce API Аутентификация
-  description: API для регистрации пользователей, входа и управления токенами доступа.
+  title: E-commerce API Автентифікація
+  description: API для реєстрації користувачів, входу та керування токенами доступу.
   version: 1.0.0
 servers:
   - url: /api/v1
-    description: Main server (v1 prefix)
+    description: Основний сервер (префікс v1)
 
-# API tags grouping
+# Групування тегів API
 tags:
   - name: auth
-    description: Authentication operations
+    description: Операції автентифікації
 
 paths:
-  # User registration endpoint
+  # Ендпоїнт реєстрації користувача
   /auth/register:
     post:
       tags:
         - auth
-      summary: Регистрация нового пользователя
-      description: Создает новую учетную запись пользователя.
+      summary: Реєстрація нового користувача
+      description: Створює новий обліковий запис користувача.
       operationId: registerUser
       requestBody:
-        description: Registration data
+        description: Дані для реєстрації
         required: true
         content:
           application/json:
@@ -31,7 +31,7 @@ paths:
               $ref: '#/components/schemas/RegisterRequest'
       responses:
         '201':
-          description: Пользователь успешно создан
+          description: Користувача успішно створено
           content:
             application/json:
               schema:
@@ -42,24 +42,24 @@ paths:
                     format: uuid
                     example: "550e8400-e29b-41d4-a716-446655440000"
         '400':
-          description: Ошибка валидации
+          description: Помилка валідації
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '409':
-          description: Пользователь уже существует
+          description: Користувач уже існує
 
-  # User login endpoint
+  # Ендпоїнт входу користувача
   /auth/login:
     post:
       tags:
         - auth
-      summary: Вход в систему
-      description: Аутентификация пользователя и выдача токенов.
+      summary: Вхід у систему
+      description: Автентифікація користувача та видача токенів.
       operationId: loginUser
       requestBody:
-        description: User credentials
+        description: Облікові дані користувача
         required: true
         content:
           application/json:
@@ -67,21 +67,21 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Успешный вход
+          description: Успішний вхід
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
-          description: Неверные учетные данные
+          description: Невірні облікові дані
 
-  # Token refresh endpoint
+  # Ендпоїнт оновлення токена
   /auth/refresh:
     post:
       tags:
         - auth
-      summary: Обновление токена доступа
-      description: Получение нового Access токена.
+      summary: Оновлення токена доступу
+      description: Отримання нового Access токена.
       operationId: refreshToken
       requestBody:
         required: true
@@ -91,7 +91,7 @@ paths:
               $ref: '#/components/schemas/RefreshTokenRequest'
       responses:
         '200':
-          description: Токен обновлен
+          description: Токен оновлено
           content:
             application/json:
               schema:
@@ -100,26 +100,26 @@ paths:
                   access_token:
                     type: string
 
-  # Logout endpoint
+  # Ендпоїнт виходу з системи
   /auth/logout:
     post:
       tags:
         - auth
-      summary: Выход из системы
-      description: Завершение сессии.
+      summary: Вихід із системи
+      description: Завершення поточної сесії.
       operationId: logoutUser
       responses:
         '200':
-          description: Успешный выход
+          description: Успішний вихід
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessResponse'
 
-# Data models
+# Моделі даних
 components:
   schemas:
-    # Model for user registration
+    # Модель для реєстрації користувача
     RegisterRequest:
       type: object
       required:
@@ -133,7 +133,7 @@ components:
           type: string
           format: password
 
-    # Model for login
+    # Модель для входу
     LoginRequest:
       type: object
       required:
@@ -145,7 +145,7 @@ components:
         password:
           type: string
 
-    # Model for token refresh
+    # Модель для оновлення токена
     RefreshTokenRequest:
       type: object
       required:
@@ -154,7 +154,7 @@ components:
         refresh_token:
           type: string
 
-    # Combined tokens response
+    # Комбінована відповідь з токенами
     AuthResponse:
       type: object
       properties:
@@ -163,21 +163,21 @@ components:
         refresh_token:
           type: string
 
-    # Standard success response
+    # Стандартна відповідь про успіх
     SuccessResponse:
       type: object
       properties:
         message:
           type: string
-          example: "Logged out successfully"
+          example: "Вихід із системи виконано успішно"
 
-    # Standard error response structure
+    # Стандартна структура відповіді про помилку
     ErrorResponse:
       type: object
       properties:
         error:
           type: string
-          example: "Internal server error"
+          example: "Внутрішня помилка сервера"
         status:
           type: integer
           example: 500

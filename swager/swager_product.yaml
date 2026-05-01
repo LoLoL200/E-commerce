@@ -1,163 +1,223 @@
-# Swagger documentation for Product Handler
-# English comments for technical reference
+openapi: 3.0.0
+info:
+  title: E-commerce API Товарів
+  description: API для керування та пошуку товарів у магазині
+  version: 1.0.0
 
-  # --- PRODUCT ENDPOINTS ---
+servers:
+  - url: /api/v1
+    description: Основний сервер API
+
+paths:
   /products:
     get:
       tags:
-        - products
-      summary: Список всех товаров
-      description: Получение списка товаров с поддержкой пагинации, фильтрации по категории и поиску.
+        - товари
+      summary: Список усіх товарів
+      description: Отримання списку товарів з пагінацією, фільтрацією за категорією та сортуванням.
       operationId: listProducts
       parameters:
         - name: search
           in: query
-          description: Поиск по названию или описанию
+          description: Пошук за назвою або описом
           schema:
             type: string
         - name: order_by
           in: query
-          description: Сортировка (например, price_asc, price_desc, name)
+          description: Сортування (наприклад, price_asc, price_desc)
           schema:
             type: string
         - name: limit
           in: query
-          description: Количество товаров (по умолчанию 30)
+          description: Кількість результатів (за замовчуванням 30)
           schema:
             type: integer
             default: 30
         - name: offset
           in: query
-          description: Смещение для пагинации
+          description: Зміщення для пагінації
           schema:
             type: integer
             default: 0
         - name: category_id
           in: query
-          description: UUID категории для фильтрации
+          description: UUID категорії для фільтрації
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Успешное получение списка
+          description: Успішна відповідь
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductListResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
         '400':
-          description: Некорректные параметры запроса
-
-  /products/{id}:
-    get:
-      tags:
-        - products
-      summary: Детали товара
-      description: Получение полной информации о товаре по его UUID.
-      operationId: getProductDetails
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: UUID товара
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Информация о товаре получена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-        '404':
-          description: Товар не найден
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /products/search:
     get:
       tags:
-        - products
-      summary: Поиск товаров
-      description: Специализированный эндпоинт для поиска (требует обязательный параметр search).
+        - товари
+      summary: Пошук товарів
+      description: Спеціалізований пошук. Параметр search є обов'язковим.
       operationId: searchProducts
       parameters:
         - name: search
           in: query
           required: true
-          description: Строка поиска
+          description: Рядок пошуку
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: order_by
+          in: query
           schema:
             type: string
       responses:
         '200':
-          description: Результаты поиска
+          description: Результати пошуку
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductListResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /products/categories:
     get:
       tags:
-        - products
-      summary: Товары по категориям
-      description: Возвращает товары, принадлежащие конкретной категории.
+        - товари
+      summary: Товари за категоріями
+      description: Отримання списку товарів конкретної категорії.
       operationId: listByCategory
       parameters:
         - name: category
           in: query
           required: true
-          description: UUID категории
+          description: UUID категорії
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Список товарів у категорії
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /products/{id}:
+    get:
+      tags:
+        - товари
+      summary: Деталі товару
+      description: Повна інформація про товар за його UUID.
+      operationId: getProductDetails
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID товару
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Список товаров в категории
+          description: Інформація про товар
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductListResponse'
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Некоректний формат UUID
+        '404':
+          description: Товар не знайдено
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
-# ... (Previous securitySchemes and schemas stay here)
+  responses:
+    BadRequest:
+      description: Некоректні параметри запиту
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Внутрішня помилка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 
   schemas:
-    # Product Data Model
     Product:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          description: Унікальний ідентифікатор товару
         name:
           type: string
+          description: Назва товару
         description:
           type: string
+          description: Опис товару
         price:
           type: number
           format: float
-        quantity:
-          type: integer
+          description: Ціна товару
         category_id:
           type: string
           format: uuid
+          description: ID категорії, до якої належить товар
+        stock:
+          type: integer
+          description: Кількість одиниць у наявності
         image_url:
           type: string
+          description: Посилання на зображення товару
         created_at:
           type: string
           format: date-time
+          description: Дата та час додавання товару
 
-    # Paginated Response Model (matches ProductListResponse in your Go code)
-    ProductListResponse:
+    ErrorResponse:
       type: object
       properties:
-        products:
-          type: array
-          items:
-            $ref: '#/components/schemas/Product'
-        total:
-          type: integer
-        limit:
-          type: integer
-        offset:
-          type: integer
+        error:
+          type: string
+          example: "Тут буде опис помилки"
