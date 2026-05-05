@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	repository "ecommers/internal/repository/postgres"
 	"ecommers/pkg/utils"
 	"log"

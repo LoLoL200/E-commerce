@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	httpHandler "ecommers/handler/http"
 	"ecommers/internal/db"
+	httpHandler "ecommers/internal/handler/http"
 	postgres "ecommers/internal/repository/postgres"
 	userService "ecommers/internal/service/auth"
 	cart "ecommers/internal/service/cart"

@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	H "ecommers/handler/http"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
+	H "ecommers/internal/handler/http"
 	"ecommers/internal/service/auth/mocks"
 
 	"github.com/golang/mock/gomock"

@@ -36,21 +36,15 @@ func NewRouter(config RouterConfig) *chi.Mux {
 
 	r.Route("/api/v1", func(r chi.Router) {
 
-		// ======================
-		// AUTH (public)
-		// ======================
+		// AUTH (
 		authHandler := NewAuthHandler(config.AuthService)
 		authHandler.RegisterRoutes(r)
 
-		// ======================
-		// PRODUCT (public)
-		// ======================
+		// PRODUCT
 		productHandler := NewProductHandler(config.ProductService)
 		productHandler.ProductsRoutes(r)
 
-		// ======================
-		// PROTECTED ROUTES (Auth Required)
-		// ======================
+		// PROTECTED ROUTES
 		r.Group(func(r chi.Router) {
 			r.Use(RequireAuth(config.AuthService))
 
@@ -62,12 +56,12 @@ func NewRouter(config RouterConfig) *chi.Mux {
 			userHandler := NewUserHandler(config.UserService, config.AuthService)
 			userHandler.RegsterRoutes(r)
 
-			// ORDERS (Добавляем сюда)
+			// ORDERS
 			// ======================
 			// ORDER (protected)
-			// ======================
+
 			orderHandler := NewOrderHandler(config.OrderService)
-			orderHandler.OrderRoutes(r) // 3. Регистрируем маршруты заказов
+			orderHandler.OrderRoutes(r)
 		})
 	})
 

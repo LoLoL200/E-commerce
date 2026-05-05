@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	database "ecommers/internal/db"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	"fmt"
 
 	"github.com/google/uuid"

@@ -2,7 +2,7 @@ package cart
 
 import (
 	"context"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	repository "ecommers/internal/repository/postgres"
 	"errors"
 

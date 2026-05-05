@@ -2,7 +2,7 @@ package product
 
 import (
 	"context"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	repository "ecommers/internal/repository/postgres"
 	"ecommers/pkg/utils"
 	"fmt"

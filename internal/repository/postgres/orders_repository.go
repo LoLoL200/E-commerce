@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	database "ecommers/internal/db"
-	models "ecommers/internal/domin" // Проверь опечатку в пути (domin -> domain?)
+	models "ecommers/internal/domain" // Проверь опечатку в пути (domin -> domain?)
 	"fmt"
 	"time"
 

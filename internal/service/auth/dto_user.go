@@ -1,6 +1,6 @@
 package auth
 
-import models "ecommers/internal/domin"
+import models "ecommers/internal/domain"
 
 type UserFillter struct {
 	Search  string

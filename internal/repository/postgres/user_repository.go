@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	"errors"
 
 	//models "e_commerce/internal/domin"

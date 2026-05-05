@@ -1,7 +1,7 @@
 package product
 
 import (
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 
 	"github.com/google/uuid"
 )

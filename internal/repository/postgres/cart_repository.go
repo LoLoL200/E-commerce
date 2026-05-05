@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	database "ecommers/internal/db"
-	models "ecommers/internal/domin" // Проверь опечатку в названии папки (domin -> domain?)
+	models "ecommers/internal/domain" // Проверь опечатку в названии папки (domin -> domain?)
 	"ecommers/pkg/utils"
 	"fmt"
 

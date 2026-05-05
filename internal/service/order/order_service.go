@@ -2,7 +2,7 @@ package order
 
 import (
 	"context"
-	models "ecommers/internal/domin" // Check path naming: domin vs domain
+	models "ecommers/internal/domain" // Check path naming: domin vs domain
 	repository "ecommers/internal/repository/postgres"
 	"errors"
 	"fmt"

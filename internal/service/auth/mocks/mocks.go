@@ -6,7 +6,7 @@ package mocks
 
 import (
 	context "context"
-	models "ecommers/internal/domin"
+	models "ecommers/internal/domain"
 	auth "ecommers/internal/service/auth"
 	reflect "reflect"
 
