@@ -4,23 +4,25 @@ import (
 	cart "ecommers/internal/service/cart"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
+// CartHandler handles HTTP requests for authentication
 type CartHandler struct {
 	cartService cart.CartService
 }
 
+// NewAuthHandler creates a new auth handler
 func NewCartHandler(service cart.CartService) *CartHandler {
 	return &CartHandler{
 		cartService: service,
 	}
 }
 
+// RegisterRoutes registers all cart routes
 func (h *CartHandler) RegisterRoutes(r chi.Router) {
 	r.Route("/cart", func(r chi.Router) {
 		r.Get("/", h.GetCart)
@@ -44,6 +46,7 @@ func (h *CartHandler) RegisterRoutes(r chi.Router) {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/cart [get]
+// Get cart if user  have Bearer Token
 func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 	userID, ok := GetUserIDFromContext(r.Context())
 	if !ok {
@@ -53,9 +56,6 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 
 	cartData, err := h.cartService.GetCart(r.Context(), userID)
 	if err != nil {
-		// --- ВОТ ЭТО САМОЕ ВАЖНОЕ ---
-		log.Printf("🔴 CART SERVICE ERROR: %v", err)
-		// ----------------------------
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -73,13 +73,10 @@ func (h *CartHandler) GetCart(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} ErrorResponse
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/cart [get]
-
+// Add new Item if user have  Bearer Token
 func (h *CartHandler) AddItem(w http.ResponseWriter, r *http.Request) {
-	log.Printf("DEBUG: Entering AddItem handler") // Добавь это
-
 	userID, err := getUserID(r)
 	if err != nil {
-		log.Printf("DEBUG: getUserID failed: %v", err) // И это
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
@@ -114,6 +111,7 @@ func (h *CartHandler) AddItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Router /api/v1/cart/items/{id} [put]
+// Update
 func (h *CartHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {
@@ -155,6 +153,7 @@ func (h *CartHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} ErrorResponse
 // @Failure 401 {object} ErrorResponse
 // @Router /api/v1/cart/items/{id} [delete]
+// Remove item, if user have Bearer Token
 func (h *CartHandler) RemoveItem(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {
@@ -185,6 +184,8 @@ func (h *CartHandler) RemoveItem(w http.ResponseWriter, r *http.Request) {
 // @Success 200 "OK"
 // @Failure 401 {object} ErrorResponse
 // @Router /api/v1/cart [delete]
+
+// Clear cart, if user have  Bearer Token
 func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {
@@ -201,6 +202,7 @@ func (h *CartHandler) ClearCart(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Get user ID
 func getUserID(r *http.Request) (uuid.UUID, error) {
 	val := r.Context().Value(ContextKeyUserID)
 	if val == nil {

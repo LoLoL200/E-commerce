@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	database "ecommers/internal/db"
-	models "ecommers/internal/domain" // Проверь опечатку в названии папки (domin -> domain?)
+	models "ecommers/internal/domain"
 	"ecommers/pkg/utils"
 	"fmt"
 
 	"github.com/google/uuid"
 )
 
+// Cart Repository
 type CartRepository interface {
 	GetCartByUserID(ctx context.Context, userID uuid.UUID) (*models.Cart, error)
 	AddItem(ctx context.Context, userID uuid.UUID, item *models.CartItem) error
@@ -20,6 +21,7 @@ type CartRepository interface {
 	GetItemByUserAndProduct(ctx context.Context, userID, productID uuid.UUID) (*models.CartItem, error)
 }
 
+// REPO
 type cartRepo struct {
 	db *database.DB
 }
@@ -28,7 +30,7 @@ func NewCartRepository(db *database.DB) CartRepository {
 	return &cartRepo{db: db}
 }
 
-// GetCartByUserID теперь собирает корзину "на лету" из таблицы cart_items
+// GetCartByUserID now assembles the cart "on the fly" from the `cart_items` table.
 func (c *cartRepo) GetCartByUserID(ctx context.Context, userID uuid.UUID) (*models.Cart, error) {
 	query := `
         SELECT id, product_id, quantity
@@ -49,7 +51,7 @@ func (c *cartRepo) GetCartByUserID(ctx context.Context, userID uuid.UUID) (*mode
 
 	for rows.Next() {
 		var item models.CartItem
-		item.CartID = userID // В этой схеме CartID по сути равен UserID
+		item.CartID = userID
 		if err := rows.Scan(&item.ID, &item.ProductID, &item.Quantity); err != nil {
 			return nil, fmt.Errorf("scan item error: %w", err)
 		}
@@ -59,7 +61,7 @@ func (c *cartRepo) GetCartByUserID(ctx context.Context, userID uuid.UUID) (*mode
 	return cart, nil
 }
 
-// AddItem теперь использует user_id напрямую
+// AddItem now uses user_id directly.
 func (c *cartRepo) AddItem(ctx context.Context, userID uuid.UUID, item *models.CartItem) error {
 	query := `
         INSERT INTO cart_items (id, user_id, product_id, quantity)
@@ -69,7 +71,7 @@ func (c *cartRepo) AddItem(ctx context.Context, userID uuid.UUID, item *models.C
     `
 
 	_, err := c.db.ExecContext(ctx, query,
-		uuid.New(), // Генерируем новый ID для записи
+		uuid.New(),
 		userID,
 		item.ProductID,
 		item.Quantity,
@@ -82,7 +84,7 @@ func (c *cartRepo) AddItem(ctx context.Context, userID uuid.UUID, item *models.C
 	return nil
 }
 
-// UpdateItemByUser обновляет количество товара конкретного юзера
+// UpdateItemByUser updates the quantity of an item for a specific user.
 func (c *cartRepo) UpdateItemByUser(ctx context.Context, userID, productID uuid.UUID, quantity int) error {
 	query := `
         UPDATE cart_items
@@ -103,7 +105,7 @@ func (c *cartRepo) UpdateItemByUser(ctx context.Context, userID, productID uuid.
 	return nil
 }
 
-// DeleteItemByUser удаляет конкретный товар из корзины юзера
+// // Delete Item By User removes a specific item from a user's cart.
 func (c *cartRepo) DeleteItemByUser(ctx context.Context, userID, productID uuid.UUID) error {
 	query := `DELETE FROM cart_items WHERE user_id = $1 AND product_id = $2`
 
@@ -120,7 +122,7 @@ func (c *cartRepo) DeleteItemByUser(ctx context.Context, userID, productID uuid.
 	return nil
 }
 
-// ClearCart очищает всю корзину юзера
+// CClear Cart clears the user's entire shopping cart.
 func (c *cartRepo) ClearCart(ctx context.Context, userID uuid.UUID) error {
 	query := `DELETE FROM cart_items WHERE user_id = $1`
 
@@ -132,7 +134,7 @@ func (c *cartRepo) ClearCart(ctx context.Context, userID uuid.UUID) error {
 	return nil
 }
 
-// GetItemByUserAndProduct нужен для проверки, есть ли уже такой товар в корзине
+// Get Item By User And Product is used to check if the item is already in the cart.
 func (c *cartRepo) GetItemByUserAndProduct(ctx context.Context, userID, productID uuid.UUID) (*models.CartItem, error) {
 	query := `
         SELECT id, product_id, quantity

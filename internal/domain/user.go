@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// User DB
 type User struct {
 	ID           uuid.UUID `db:"id" json:"id"`
 	Email        string    `db:"email" json:"email"`

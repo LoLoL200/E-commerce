@@ -4,6 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Product DB
 type Product struct {
 	ID          uuid.UUID `db:"id" json:"id"`
 	CategoryID  uuid.UUID `db:"category_id" json:"category_id"`

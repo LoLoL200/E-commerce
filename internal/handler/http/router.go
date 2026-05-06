@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
+// Router CFG
 type RouterConfig struct {
 	AuthService    auth.AuthService
 	UserService    userService.UserService
@@ -20,6 +21,7 @@ type RouterConfig struct {
 	OrderService   order.OrderService
 }
 
+// Create router
 func NewRouter(config RouterConfig) *chi.Mux {
 	r := chi.NewRouter()
 
@@ -54,12 +56,9 @@ func NewRouter(config RouterConfig) *chi.Mux {
 
 			// USERS
 			userHandler := NewUserHandler(config.UserService, config.AuthService)
-			userHandler.RegsterRoutes(r)
+			userHandler.RegisterRoutes(r)
 
 			// ORDERS
-			// ======================
-			// ORDER (protected)
-
 			orderHandler := NewOrderHandler(config.OrderService)
 			orderHandler.OrderRoutes(r)
 		})

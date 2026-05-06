@@ -10,11 +10,8 @@ import (
 )
 
 type ProductRepository interface {
-	//CreateProduct(ctx context.Context, product *models.Product) error
 	GetByIDProduct(ctx context.Context, id uuid.UUID) (*models.Product, error)
-	//GetNameProduct(ctx context.Context, name string) (*models.Product, error)
 	UpdateProduct(ctx context.Context, product *models.Product) error
-	//DeleteProduct(ctx context.Context, id uuid.UUID) error
 	ListProduct(ctx context.Context, limit, offset int) ([]*models.Product, error)
 	ListProductByCategory(ctx context.Context, category uuid.UUID, limit, offset int) ([]*models.Product, error)
 }
@@ -29,8 +26,6 @@ func NewProductRepository(db *database.DB) ProductRepository {
 
 // CreateProduct
 func (p *productRepo) CreateProduct(ctx context.Context, product *models.Product) error {
-	// Вставляем именно в products!
-	// Убедись, что имена колонок совпадают с твоей таблицей продуктов
 	query := `
         INSERT INTO products (name, description, price, quantity, category_id)
         VALUES ($1, $2, $3, $4, $5)
@@ -93,6 +88,8 @@ func (p *productRepo) GetNameProduct(ctx context.Context, name string) (*models.
 	}
 	return product, nil
 }
+
+// List Product by Category
 func (p *productRepo) ListProductByCategory(ctx context.Context, category_id uuid.UUID, limit, offset int) ([]*models.Product, error) {
 	query := `
         SELECT id, name, description, price, stock, category_id
@@ -191,13 +188,12 @@ func (p *productRepo) ListProduct(ctx context.Context, limit, offset int) ([]*mo
 	var products []*models.Product
 	for rows.Next() {
 		product := &models.Product{}
-		// Порядок в Scan должен быть ТАКИМ ЖЕ, как в SELECT выше
 		err := rows.Scan(
 			&product.ID,
 			&product.Name,
 			&product.Description,
 			&product.Price,
-			&product.Quantity, // Это упадет в поле stock в БД
+			&product.Quantity,
 			&product.CategoryID,
 		)
 		if err != nil {

@@ -18,6 +18,8 @@ type TokenClaims struct {
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 }
+
+// SERVICE
 type AuthService interface {
 	Register(ctx context.Context, email, password string) (uuid.UUID, error)
 	Login(ctx context.Context, email, password string) (string, string, error)
@@ -29,6 +31,7 @@ type authService struct {
 	secret   string
 }
 
+// REGISTER
 func (a *authService) Register(ctx context.Context, email, password string) (uuid.UUID, error) {
 	user, err := a.userRepo.GetEmail(ctx, email)
 	if err != nil && err != utils.ErrUserNotfound {
@@ -39,13 +42,11 @@ func (a *authService) Register(ctx context.Context, email, password string) (uui
 		return uuid.Nil, utils.ErrUserAlreadyExists
 	}
 
-	// hash password
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return uuid.Nil, err
 	}
 
-	// CREATE USER (вот этого у тебя не было)
 	newUser := &models.User{
 		ID:           uuid.New(),
 		Email:        email,
@@ -54,13 +55,14 @@ func (a *authService) Register(ctx context.Context, email, password string) (uui
 		CreateAt:     time.Now(),
 	}
 
-	// SAVE TO DB
 	if err := a.userRepo.Create(ctx, newUser); err != nil {
 		return uuid.Nil, err
 	}
 
 	return newUser.ID, nil
 }
+
+// LOGIN
 func (a *authService) Login(ctx context.Context, email, password string) (string, string, error) {
 	user, err := a.userRepo.GetEmail(ctx, email)
 	if err != nil {
@@ -87,8 +89,9 @@ func (a *authService) Login(ctx context.Context, email, password string) (string
 	return access, refresh, nil
 }
 
+// REFRESH TOKEN
 func (a *authService) Refresh(ctx context.Context, refreshToken string) (string, error) {
-	// 1. валидируем refresh token
+
 	token, err := jwt.Parse(refreshToken, func(t *jwt.Token) (any, error) {
 		return []byte(a.secret), nil
 	})
@@ -108,19 +111,15 @@ func (a *authService) Refresh(ctx context.Context, refreshToken string) (string,
 		return "", err
 	}
 
-	// 2. достаём пользователя (лучше из БД)
 	user, err := a.userRepo.GetByID(ctx, userID)
 	if err != nil {
 		return "", err
 	}
 
-	// 3. выдаём новый access token
 	return a.generateAccessToken(user)
 }
 
-//	func (a *authService) ValidateToken(token string) (*TokenClaims, error) {
-//		panic("implement me")
-//	}
+// Validate token
 func (a *authService) ValidateToken(tokenString string) (*TokenClaims, error) {
 
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (any, error) {
@@ -132,7 +131,7 @@ func (a *authService) ValidateToken(tokenString string) (*TokenClaims, error) {
 
 	if err != nil {
 		log.Printf("🔴 JWT Parsing Error: %v", err)
-		return nil, err // Здесь вернется "token is expired" или "signature is invalid"
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -140,7 +139,6 @@ func (a *authService) ValidateToken(tokenString string) (*TokenClaims, error) {
 		return nil, utils.ErrInvalidCredentials
 	}
 
-	// Извлекаем данные точно по тем ключам, которые использовали при генерации
 	userID, _ := claims["user_id"].(string)
 	email, _ := claims["email"].(string)
 	role, _ := claims["role"].(string)
@@ -152,12 +150,15 @@ func (a *authService) ValidateToken(tokenString string) (*TokenClaims, error) {
 	}, nil
 }
 
+// Create auth service
 func NewAuthService(repo repository.UserRepository, secret string) *authService {
 	return &authService{
 		userRepo: repo,
 		secret:   secret,
 	}
 }
+
+// Generate Access token
 func (a *authService) generateAccessToken(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID.String(),
@@ -169,6 +170,8 @@ func (a *authService) generateAccessToken(user *models.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(a.secret))
 }
+
+// Generate Refresh Token
 func (a *authService) generateRefreshToken(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID.String(),

@@ -2,7 +2,6 @@ package http
 
 import (
 	"ecommers/internal/service/order"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -39,14 +38,14 @@ func (h *OrderHandler) OrderRoutes(r chi.Router) {
 // @Failure 500 {object} ErrorResponse "Internal Server Error"
 // @Router /api/v1/orders [post]
 // POST /api/v1/orders
+// Create new order
 func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("DEBUG: service address: %p\n", h.orderService)
-	userID, err := getUserID(r) // Твоя функция извлечения ID из контекста
+	userID, err := getUserID(r)
+
 	if err != nil {
 		respondError(w, http.StatusUnauthorized, "unauthorized")
 		return
 	}
-
 	order, err := h.orderService.CreateFromCart(r.Context(), userID)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, "failed to create order: "+err.Error())
@@ -66,6 +65,7 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/orders [get]
 // GET /api/v1/orders
+// List users orders
 func (h *OrderHandler) ListMyOrders(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {
@@ -94,6 +94,7 @@ func (h *OrderHandler) ListMyOrders(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} ErrorResponse "Order not found"
 // @Router /api/v1/orders/{id} [get]
 // GET /api/v1/orders/{id}
+// Derails order, it`s have only ADMIN
 func (h *OrderHandler) DetailsOrder(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {
@@ -129,6 +130,7 @@ func (h *OrderHandler) DetailsOrder(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} ErrorResponse
 // @Router /api/v1/orders/{id}/cancel [put]
 // PUT /api/v1/orders/{id}/cancel
+// Cencel
 func (h *OrderHandler) Cancel(w http.ResponseWriter, r *http.Request) {
 	userID, err := getUserID(r)
 	if err != nil {

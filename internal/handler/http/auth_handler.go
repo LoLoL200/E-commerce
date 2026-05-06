@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	//authService "ecommer/internal/service/auth"
-
 	"github.com/go-chi/chi/v5"
 )
 
@@ -55,7 +53,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// respondJSON(w, http.StatusCreated, response)
 	id, err := h.authService.Register(r.Context(), req.Email, req.Password)
 	if err != nil {
 		log.Printf("❌ register error: %v", err)
@@ -85,7 +82,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req auth.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondError(w, http.StatusBadRequest, "Invalid request body")
-		//log.Printf("❌ decode error: %v", err)
 		return
 
 	}
@@ -93,7 +89,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	// Call service
 	access, refresh, err := h.authService.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
-		//log.Printf("❌ login error: %v", err) //
 		handleAuthError(w, err)
 		return
 	}
@@ -150,9 +145,7 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} SuccessResponse
 // @Router /api/v1/auth/logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	// In JWT-based auth, logout is typically handled client-side
-	// by deleting the tokens. This endpoint exists for consistency
-	// and could be used to blacklist tokens in a production system.
+	// Log out of your account
 
 	respondJSON(w, http.StatusOK, SuccessResponse{
 		Message: "Logged out successfully",
@@ -169,7 +162,7 @@ type SuccessResponse struct {
 	Message string `json:"message"`
 }
 
-// handleAuthError maps auth service errors to HTTP status codes
+// HandleAuthError maps auth service errors to HTTP status codes
 func handleAuthError(w http.ResponseWriter, err error) {
 	switch err {
 	case utils.ErrEmailRequired,

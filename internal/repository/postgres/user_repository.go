@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// REPO
 type UserRepository interface {
 	Create(ctx context.Context, user *models.User) error
 	GetByID(ctx context.Context, id uuid.UUID) (*models.User, error)

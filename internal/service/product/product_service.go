@@ -33,7 +33,6 @@ func (s *serviceProduct) GetProduct(ctx context.Context, id uuid.UUID) (*models.
 
 // ListProduct implements [ProductService].
 func (s *serviceProduct) ListProduct(ctx context.Context, filter ProductFilter) (*ProductListResponce, error) {
-	// Дефолтные значения пагинации
 	if filter.Limit <= 0 {
 		filter.Limit = 10
 	}
@@ -46,7 +45,6 @@ func (s *serviceProduct) ListProduct(ctx context.Context, filter ProductFilter) 
 		return nil, fmt.Errorf("list product error: %w", err)
 	}
 
-	// Фильтрация по Search
 	if filter.Search != "" {
 		filtered := make([]*models.Product, 0)
 		search := strings.ToLower(filter.Search)
@@ -59,7 +57,6 @@ func (s *serviceProduct) ListProduct(ctx context.Context, filter ProductFilter) 
 		products = filtered
 	}
 
-	// Фильтрация по Category
 	if filter.CategoryID != nil {
 		filtered := make([]*models.Product, 0)
 		for _, p := range products {
@@ -70,7 +67,6 @@ func (s *serviceProduct) ListProduct(ctx context.Context, filter ProductFilter) 
 		products = filtered
 	}
 
-	// Сортировка
 	switch filter.OrderBy {
 	case "price_asc":
 		sort.Slice(products, func(i, j int) bool {
@@ -138,13 +134,11 @@ func (s *serviceProduct) UpdateProduct(ctx context.Context, id uuid.UUID, reques
 		return nil, fmt.Errorf("permission denied: admin only")
 	}
 
-	//// Get an existing product
 	product, err := s.productRepo.GetByIDProduct(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("product not found: %w", err)
 	}
 
-	// Update only the passed fields
 	if request.Name != nil {
 		product.Name = *request.Name
 	}

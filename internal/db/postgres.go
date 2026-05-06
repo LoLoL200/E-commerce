@@ -13,6 +13,7 @@ type DB struct {
 	*sqlx.DB
 }
 
+// CFG
 type Config struct {
 	Host     string
 	Port     string
@@ -22,6 +23,7 @@ type Config struct {
 	SSLMode  string
 }
 
+// Create Data Base (DB)
 func NewDB(ctg Config) (*DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		ctg.Host, ctg.Port, ctg.User, ctg.Password, ctg.DBName, ctg.SSLMode)
@@ -42,6 +44,8 @@ func NewDB(ctg Config) (*DB, error) {
 	}
 	return &DB{db}, nil
 }
+
+// Close
 func (db *DB) Close() error {
 	return db.DB.Close()
 }

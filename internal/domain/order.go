@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Order статус заказа
+// Order Status
 type OrderStatus string
 
 const (
@@ -16,6 +16,7 @@ const (
 	StatusCancelled OrderStatus = "cancelled"
 )
 
+// Order DB
 type Order struct {
 	ID              uuid.UUID   `db:"id" json:"id"`
 	UserID          uuid.UUID   `db:"user_id" json:"user_id"`
@@ -28,6 +29,7 @@ type Order struct {
 	Items           []OrderItem `json:"items"`
 }
 
+// DB order item`s
 type OrderItem struct {
 	ID        uuid.UUID `db:"id" json:"id"`
 	OrderID   uuid.UUID `db:"order_id" json:"order_id"`

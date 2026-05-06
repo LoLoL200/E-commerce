@@ -10,10 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
+// Product Service
 type ProductHandler struct {
 	productService product.ProductService
 }
 
+// New Product
 func NewProductHandler(service product.ProductService) *ProductHandler {
 	return &ProductHandler{
 		productService: service,
@@ -43,6 +45,7 @@ func (h *ProductHandler) ProductsRoutes(r chi.Router) {
 // @Failure 400 {object} ErrorResponse "Invalid parameters"
 // @Failure 500 {object} ErrorResponse "Internal server error"
 // @Router /api/v1/products [get]
+// List Product
 func (h *ProductHandler) List(write http.ResponseWriter, request *http.Request) {
 	query := request.URL.Query()
 	filter := product.ProductFilter{
@@ -99,6 +102,7 @@ func (h *ProductHandler) List(write http.ResponseWriter, request *http.Request) 
 // @Failure 400 {object} ErrorResponse "Invalid UUID format"
 // @Failure 404 {object} ErrorResponse "Product not found"
 // @Router /api/v1/products/{id} [get]
+// Details product(search for Id )
 func (h *ProductHandler) DetailsProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -129,6 +133,7 @@ func (h *ProductHandler) DetailsProduct(w http.ResponseWriter, r *http.Request) 
 // @Failure 400 {object} ErrorResponse "Search query missing or invalid params"
 // @Failure 500 {object} ErrorResponse "Search execution failed"
 // @Router /api/v1/products/search [get]
+// Search all product
 func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	filter := product.ProductFilter{
@@ -181,6 +186,7 @@ func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} ErrorResponse "Category ID missing or invalid"
 // @Failure 500 {object} ErrorResponse "Query failed"
 // @Router /api/v1/products/categories [get]
+// List product for category
 func (h *ProductHandler) ListCategory(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 

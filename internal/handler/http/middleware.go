@@ -18,7 +18,7 @@ const (
 	ContextKeyUserEmail contextKey = "user_email"
 )
 
-// RequireAuth проверяет JWT и кладёт данные в context
+// RequireAuth then JWT and puts the data into the context
 func RequireAuth(authSrv auth.AuthService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +39,6 @@ func RequireAuth(authSrv auth.AuthService) func(http.Handler) http.Handler {
 			log.Printf("DEBUG: Exact token received: [%s]", tokenString)
 			claims, err := authSrv.ValidateToken(tokenString)
 			if err != nil {
-				log.Printf("DEBUG: Token validation failed: %v", err) // <--- ВОТ ЭТО
 				respondError(w, http.StatusUnauthorized, "invalid or expired token")
 				return
 			}

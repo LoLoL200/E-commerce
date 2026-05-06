@@ -21,10 +21,11 @@ func NewUserHandler(srvc userService.UserService, authSrv auth.AuthService) *Use
 	}
 }
 
-func (h *UserHandler) RegsterRoutes(r chi.Router) {
+// Router for register
+func (h *UserHandler) RegisterRoutes(r chi.Router) {
 	r.Route("/profile", func(r chi.Router) {
 		r.Get("/", h.GetProfile)
-		r.Put("/", h.UdateProfile)
+		r.Put("/", h.UpdateProfile)
 	})
 }
 
@@ -38,6 +39,7 @@ func (h *UserHandler) RegsterRoutes(r chi.Router) {
 // @Failure 401 {object} ErrorResponse "User not authenticated"
 // @Failure 404 {object} ErrorResponse "User not found"
 // @Router /api/v1/profile [get]
+// GET
 func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 	userID, ok := GetUserIDFromContext(r.Context())
 	if !ok {
@@ -65,7 +67,8 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} ErrorResponse "User not authenticated"
 // @Failure 404 {object} ErrorResponse "Failed to update profile"
 // @Router /api/v1/profile [put]
-func (h *UserHandler) UdateProfile(w http.ResponseWriter, r *http.Request) {
+// Update
+func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	userID, ok := GetUserIDFromContext(r.Context())
 	if !ok {
 		respondError(w, http.StatusUnauthorized, "user not authentificated")
@@ -77,7 +80,6 @@ func (h *UserHandler) UdateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Используем сразу req, так как типы совпадают
 	user, err := h.userService.UpdateProfile(r.Context(), userID, req, false)
 	if err != nil {
 		respondError(w, http.StatusNotFound, "Failed to update profile")

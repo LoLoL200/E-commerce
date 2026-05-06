@@ -25,19 +25,17 @@ func NewOrderRepository(db *database.DB) OrderRepository {
 	return &orderRepo{db: db}
 }
 
-// CreateOrder: Теперь учитывает ВСЕ NOT NULL колонки из твоей схемы
+// CreateOrder: Now accounts for ALL NOT NULL columns in your schemas
 func (r *orderRepo) CreateOrder(ctx context.Context, order *models.Order) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
 
-	// ВАЖНО: Добавлен payment_method и total_amount
 	queryOrder := `
         INSERT INTO orders (id, user_id, status, total_amount, shipping_address, payment_method, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	// Если в order.PaymentMethod пусто, ставим заглушку 'card', так как в БД CHECK(card, cash)
 	payMethod := order.PaymentMethod
 	if payMethod == "" {
 		payMethod = "card"
@@ -47,9 +45,9 @@ func (r *orderRepo) CreateOrder(ctx context.Context, order *models.Order) error 
 		order.ID,
 		order.UserID,
 		order.Status,
-		order.TotalAmount,     // DECIMAL(10,2)
-		order.ShippingAddress, // JSONB (Go interface{} отлично конвертируется)
-		payMethod,             // VARCHAR(20)
+		order.TotalAmount,
+		order.ShippingAddress,
+		payMethod,
 		order.CreatedAt,
 		order.UpdatedAt,
 	)
@@ -58,7 +56,6 @@ func (r *orderRepo) CreateOrder(ctx context.Context, order *models.Order) error 
 		return fmt.Errorf("failed to insert order: %w", err)
 	}
 
-	// 2. Вставляем позиции заказа
 	queryItem := `
         INSERT INTO order_items (id, order_id, product_id, quantity, price, created_at)
         VALUES ($1, $2, $3, $4, $5, $6)`
@@ -84,9 +81,8 @@ func (r *orderRepo) CreateOrder(ctx context.Context, order *models.Order) error 
 	return nil
 }
 
-// GetOrderByID: Исправлен маппинг полей
+// GetOrderByID: Field mapping corrected.
 func (r *orderRepo) GetOrderByID(ctx context.Context, id uuid.UUID) (*models.Order, error) {
-	// В таблице orders НЕТ колонки price, есть total_amount
 	queryOrder := `
         SELECT id, user_id, status, total_amount, shipping_address, payment_method, created_at, updated_at 
         FROM orders WHERE id = $1`
@@ -124,7 +120,7 @@ func (r *orderRepo) GetOrderByID(ctx context.Context, id uuid.UUID) (*models.Ord
 	return order, nil
 }
 
-// ListUserOrders: Исправлен запрос (total_amount вместо price)
+// ListUserOrders: Query fixed (total_amount вместо price)
 func (r *orderRepo) ListUserOrders(ctx context.Context, userID uuid.UUID) ([]*models.Order, error) {
 	query := `
         SELECT id, user_id, status, total_amount, shipping_address, payment_method, created_at 
@@ -151,6 +147,7 @@ func (r *orderRepo) ListUserOrders(ctx context.Context, userID uuid.UUID) ([]*mo
 	return orders, nil
 }
 
+// Upadate Order Status
 func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id uuid.UUID, status string) error {
 	query := `UPDATE orders SET status = $1, updated_at = NOW() WHERE id = $2`
 	result, err := r.db.ExecContext(ctx, query, status, id)
