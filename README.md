@@ -43,8 +43,8 @@ The E-commerce project is a REST API application that implements the business lo
 ## 🧱 Technologies Used
 
 * Golang - base all project
-* Docker -
-* Swagger
+* Docker - For a virtual server and testing
+* Swagger - For a Frontend Developer
 * PostgreSQL — database
 
 ---
