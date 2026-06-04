@@ -132,7 +132,7 @@ func (r *orderRepo) ListUserOrders(ctx context.Context, userID uuid.UUID) ([]*mo
 	}
 	defer rows.Close()
 
-	var orders []*models.Order
+	orders := make([]*models.Order, 0)
 	for rows.Next() {
 		o := &models.Order{}
 		err := rows.Scan(

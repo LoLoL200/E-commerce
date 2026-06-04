@@ -4,9 +4,9 @@ import "github.com/google/uuid"
 
 // DB carts
 type Cart struct {
-	ID     uuid.UUID  `db:"id" json:"id"`
-	UserID uuid.UUID  `db:"user_id" json:"user_id"`
-	Items  []CartItem `json:"items"`
+	ID     uuid.UUID   `db:"id" json:"id"`
+	UserID uuid.UUID   `db:"user_id" json:"user_id"`
+	Items  []*CartItem `json:"items"`
 }
 
 // DB cart item`s

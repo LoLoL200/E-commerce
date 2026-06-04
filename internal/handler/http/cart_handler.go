@@ -97,6 +97,9 @@ func (h *CartHandler) AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	respondJSON(w, http.StatusCreated, map[string]string{
+		"message": "item added to cart",
+	})
 }
 
 // UpdateItem godoc

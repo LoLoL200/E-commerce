@@ -21,9 +21,6 @@ type UserRepository interface {
 	Create(ctx context.Context, user *models.User) error
 	GetByID(ctx context.Context, id uuid.UUID) (*models.User, error)
 	GetEmail(ctx context.Context, email string) (*models.User, error)
-	Update(ctx context.Context, user *models.User) error
-	Delete(ctx context.Context, id uuid.UUID) error
-	List(ctx context.Context, limit, offset int) ([]*models.User, error)
 }
 type userRepo struct {
 	db *database.DB
@@ -40,7 +37,7 @@ func (u *userRepo) Create(ctx context.Context, user *models.User) error {
 		VALUES($1,$2,$3,$4,$5,$6)
 		RETURNING id, create_at, updated_at
 	`
-	user.ID = uuid.New()
+	//user.ID = uuid.New()
 	return u.db.QueryRowContext(
 		ctx, query,
 		user.ID, user.Email, user.PasswordHash, user.FirstName, user.Surname, user.Role,

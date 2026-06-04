@@ -38,3 +38,7 @@ type OrderItem struct {
 	Price     float64   `db:"price" json:"price"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
+type ListOrder struct {
+	Orders   []*Order
+	Quantity int
+}

@@ -29,5 +29,5 @@ type UpdateProductRequest struct {
 	Category    *uuid.UUID
 	Description *string
 	Price       *float64
-	Quantity    *int
+	Stock       *int
 }

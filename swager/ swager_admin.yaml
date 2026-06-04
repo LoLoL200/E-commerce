@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: E-commerce API Admin Panel
+  description: API для управління адмін панелью (Продукти, Замовлення, Користувачі).
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Основний сервер
+
+tags:
+  - name: Admin
+    description: Операції адмін-панелі
+
+paths:
+  /admin/product:
+    post:
+      tags:
+        - Admin
+      summary: Add new product
+      description: Create a new product in the system
+      operationId: createproduct
+      requestBody:
+        description: Data for new product
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: New product added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden (Admin only)
+        '500':
+          description: Internal server error
+
+  /admin/product/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Delete product
+      description: Delete a product by its UUID
+      operationId: deleteproduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID of the product to delete
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '204':
+          description: Product deleted successfully (No content)
+        '400':
+          description: Invalid UUID format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+  /admin/orders:
+    get:
+      tags:
+        - Admin
+      summary: Get all orders
+      description: Retrieve a list of all customer orders
+      operationId: getorders
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+  /admin/user/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Delete user
+      description: Delete a user account by its UUID
+      operationId: deleteuser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID of the user to delete
+          schema:
+            type: string
+            format: uuid
+            example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+      responses:
+        '204':
+          description: User deleted successfully (No content)
+        '400':
+          description: Invalid UUID format
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    ProductRequest:
+      type: object
+      required:
+        - name
+        - price
+      properties:
+        name:
+          type: string
+          example: "Смартфон"
+        description:
+          type: string
+          example: "Флагманський телефон"
+        price:
+          type: number
+          format: float
+          example: 999.99
+        stock:
+          type: integer
+          example: 50
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "Смартфон"
+        description:
+          type: string
+          example: "Флагманський телефон"
+        price:
+          type: number
+          format: float
+          example: 999.99
+        stock:
+          type: integer
+          example: 50
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "7a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d"
+        user_id:
+          type: string
+          format: uuid
+          example: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+        total_amount:
+          type: number
+          format: float
+          example: 1999.98
+        status:
+          type: string
+          example: "pending"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-02T15:04:05Z"

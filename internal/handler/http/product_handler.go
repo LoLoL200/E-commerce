@@ -149,10 +149,11 @@ func (h *ProductHandler) SearchProduct(w http.ResponseWriter, r *http.Request) {
 
 	if limitStr := query.Get("limit"); limitStr != "" {
 		limit, err := strconv.Atoi(limitStr)
-		if err != nil || limit <= 0 {
+		if err != nil || limit < 0 {
 			respondError(w, http.StatusBadRequest, "invalid limit")
 			return
 		}
+
 		filter.Limit = limit
 	}
 

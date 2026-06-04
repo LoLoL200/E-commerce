@@ -20,6 +20,7 @@ type ProductService interface {
 }
 type serviceProduct struct {
 	productRepo repository.ProductRepository
+	adminRepo   repository.AdminRepositorty
 }
 
 // GetProduct implements [ProductService].
@@ -51,16 +52,6 @@ func (s *serviceProduct) ListProduct(ctx context.Context, filter ProductFilter) 
 		for _, p := range products {
 			if strings.Contains(strings.ToLower(p.Name), search) ||
 				strings.Contains(strings.ToLower(p.Description), search) {
-				filtered = append(filtered, p)
-			}
-		}
-		products = filtered
-	}
-
-	if filter.CategoryID != nil {
-		filtered := make([]*models.Product, 0)
-		for _, p := range products {
-			if p.CategoryID == *filter.CategoryID {
 				filtered = append(filtered, p)
 			}
 		}
@@ -154,11 +145,10 @@ func (s *serviceProduct) UpdateProduct(ctx context.Context, id uuid.UUID, reques
 		}
 		product.Price = *request.Price
 	}
-	if request.Quantity != nil {
-		product.Quantity = *request.Quantity
+	if request.Stock != nil {
+		product.Stock = *request.Stock
 	}
-
-	if err := s.productRepo.UpdateProduct(ctx, product); err != nil {
+	if err := s.adminRepo.UpdateProduct(ctx, product); err != nil {
 		return nil, fmt.Errorf("update product error: %w", err)
 	}
 

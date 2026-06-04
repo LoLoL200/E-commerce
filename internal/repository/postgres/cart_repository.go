@@ -46,17 +46,30 @@ func (c *cartRepo) GetCartByUserID(ctx context.Context, userID uuid.UUID) (*mode
 
 	cart := &models.Cart{
 		UserID: userID,
-		Items:  []models.CartItem{},
+		Items:  []*models.CartItem{},
 	}
 
+	var rowCount int
 	for rows.Next() {
-		var item models.CartItem
+		rowCount++
+		item := new(models.CartItem)
 		item.CartID = userID
+
 		if err := rows.Scan(&item.ID, &item.ProductID, &item.Quantity); err != nil {
+			// Если упало тут — мы это увидим в консоли!
+			fmt.Printf("🔴 КРИТИЧЕСКАЯ ОШИБКА SCAN: %v\n", err)
 			return nil, fmt.Errorf("scan item error: %w", err)
 		}
 		cart.Items = append(cart.Items, item)
 	}
+
+	// ИСПРАВЛЕНИЕ: Проверяем, не прервался ли цикл из-за ошибки базы
+	if err := rows.Err(); err != nil {
+		fmt.Printf("🔴 КРИТИЧЕСКАЯ ОШИБКА ROWS.ERR: %v\n", err)
+		return nil, fmt.Errorf("rows loop error: %w", err)
+	}
+
+	fmt.Printf("DEBUG REPO: Прочитано строк из базы для юзера %s: %d\n", userID, rowCount)
 
 	return cart, nil
 }

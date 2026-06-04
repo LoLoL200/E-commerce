@@ -11,5 +11,5 @@ type Product struct {
 	Name        string    `db:"name" json:"name"`
 	Description string    `db:"description" json:"description"`
 	Price       float64   `db:"price" json:"price"`
-	Quantity    int       `db:"quantity" json:"quantity"`
+	Stock       int       `db:"stock" json:"stock"`
 }

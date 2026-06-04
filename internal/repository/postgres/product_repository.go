@@ -11,7 +11,7 @@ import (
 
 type ProductRepository interface {
 	GetByIDProduct(ctx context.Context, id uuid.UUID) (*models.Product, error)
-	UpdateProduct(ctx context.Context, product *models.Product) error
+	//UpdateProduct(ctx context.Context, product *models.Product) error
 	ListProduct(ctx context.Context, limit, offset int) ([]*models.Product, error)
 	ListProductByCategory(ctx context.Context, category uuid.UUID, limit, offset int) ([]*models.Product, error)
 }
@@ -24,26 +24,26 @@ func NewProductRepository(db *database.DB) ProductRepository {
 	return &productRepo{db: db}
 }
 
-// CreateProduct
-func (p *productRepo) CreateProduct(ctx context.Context, product *models.Product) error {
-	query := `
-        INSERT INTO products (name, description, price, quantity, category_id)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id`
+// // CreateProduct
+// func (p *productRepo) CreateProduct(ctx context.Context, product *models.Product) error {
+// 	query := `
+//         INSERT INTO products (name, description, price, quantity, category_id)
+//         VALUES ($1, $2, $3, $4, $5)
+//         RETURNING id`
 
-	err := p.db.QueryRowContext(ctx, query,
-		product.Name,
-		product.Description,
-		product.Price,
-		product.Quantity,
-		product.CategoryID,
-	).Scan(&product.ID)
+// 	err := p.db.QueryRowContext(ctx, query,
+// 		product.Name,
+// 		product.Description,
+// 		product.Price,
+// 		product.Quantity,
+// 		product.CategoryID,
+// 	).Scan(&product.ID)
 
-	if err != nil {
-		return fmt.Errorf("failed to create product: %w", err)
-	}
-	return nil
-}
+// 	if err != nil {
+// 		return fmt.Errorf("failed to create product: %w", err)
+// 	}
+// 	return nil
+// }
 
 // GetByIDProduct
 func (p *productRepo) GetByIDProduct(ctx context.Context, id uuid.UUID) (*models.Product, error) {
@@ -58,7 +58,7 @@ func (p *productRepo) GetByIDProduct(ctx context.Context, id uuid.UUID) (*models
 		&product.Name,
 		&product.Description,
 		&product.Price,
-		&product.Quantity,
+		&product.Stock,
 		&product.CategoryID,
 	)
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *productRepo) GetByIDProduct(ctx context.Context, id uuid.UUID) (*models
 // GetNameProduct
 func (p *productRepo) GetNameProduct(ctx context.Context, name string) (*models.Product, error) {
 	query := `
-        SELECT id, name, description, price, quantity, category
+        SELECT id, name, description, price, stock, category
         FROM products
         WHERE name = $1`
 
@@ -80,7 +80,7 @@ func (p *productRepo) GetNameProduct(ctx context.Context, name string) (*models.
 		&product.Name,
 		&product.Description,
 		&product.Price,
-		&product.Quantity,
+		&product.Stock,
 		&product.CategoryID,
 	)
 	if err != nil {
@@ -91,6 +91,7 @@ func (p *productRepo) GetNameProduct(ctx context.Context, name string) (*models.
 
 // List Product by Category
 func (p *productRepo) ListProductByCategory(ctx context.Context, category_id uuid.UUID, limit, offset int) ([]*models.Product, error) {
+
 	query := `
         SELECT id, name, description, price, stock, category_id
         FROM products
@@ -112,7 +113,7 @@ func (p *productRepo) ListProductByCategory(ctx context.Context, category_id uui
 			&product.Name,
 			&product.Description,
 			&product.Price,
-			&product.Quantity,
+			&product.Stock,
 			&product.CategoryID,
 		)
 		if err != nil {
@@ -123,53 +124,53 @@ func (p *productRepo) ListProductByCategory(ctx context.Context, category_id uui
 	return products, nil
 }
 
-// UpdateProduct
-func (p *productRepo) UpdateProduct(ctx context.Context, product *models.Product) error {
-	query := `
-        UPDATE products
-        SET name = $1, description = $2, price = $3, quantity = $4, category = $5
-        WHERE id = $6`
+// // UpdateProduct
+// func (p *productRepo) UpdateProduct(ctx context.Context, product *models.Product) error {
+// 	query := `
+//         UPDATE products
+//         SET name = $1, description = $2, price = $3, quantity = $4, category = $5
+//         WHERE id = $6`
 
-	result, err := p.db.ExecContext(ctx, query,
-		product.Name,
-		product.CategoryID,
-		product.Description,
-		product.Price,
-		product.Quantity,
-		product.ID,
-	)
-	if err != nil {
-		return fmt.Errorf("update product error: %w", err)
-	}
+// 	result, err := p.db.ExecContext(ctx, query,
+// 		product.Name,
+// 		product.CategoryID,
+// 		product.Description,
+// 		product.Price,
+// 		product.Quantity,
+// 		product.ID,
+// 	)
+// 	if err != nil {
+// 		return fmt.Errorf("update product error: %w", err)
+// 	}
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return fmt.Errorf("product not found")
-	}
-	return nil
-}
+// 	rows, err := result.RowsAffected()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if rows == 0 {
+// 		return fmt.Errorf("product not found")
+// 	}
+// 	return nil
+// }
 
-// DeleteProduct
-func (p *productRepo) DeleteProduct(ctx context.Context, id uuid.UUID) error {
-	query := `DELETE FROM products WHERE id = $1`
+// // DeleteProduct
+// func (p *productRepo) DeleteProduct(ctx context.Context, id uuid.UUID) error {
+// 	query := `DELETE FROM products WHERE id = $1`
 
-	result, err := p.db.ExecContext(ctx, query, id)
-	if err != nil {
-		return fmt.Errorf("delete product error: %w", err)
-	}
+// 	result, err := p.db.ExecContext(ctx, query, id)
+// 	if err != nil {
+// 		return fmt.Errorf("delete product error: %w", err)
+// 	}
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return fmt.Errorf("product not found")
-	}
-	return nil
-}
+// 	rows, err := result.RowsAffected()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	if rows == 0 {
+// 		return fmt.Errorf("product not found")
+// 	}
+// 	return nil
+// }
 
 // ListProduct
 func (p *productRepo) ListProduct(ctx context.Context, limit, offset int) ([]*models.Product, error) {
@@ -193,7 +194,7 @@ func (p *productRepo) ListProduct(ctx context.Context, limit, offset int) ([]*mo
 			&product.Name,
 			&product.Description,
 			&product.Price,
-			&product.Quantity,
+			&product.Stock,
 			&product.CategoryID,
 		)
 		if err != nil {

@@ -10,14 +10,16 @@ import (
 )
 
 type UserHandler struct {
-	userService userService.UserService
+	//userService userService.UserService
 	authService auth.AuthService
 }
 
-func NewUserHandler(srvc userService.UserService, authSrv auth.AuthService) *UserHandler {
+//srvc userService.UserService
+
+func NewUserHandler(authSrv auth.AuthService) *UserHandler {
 	return &UserHandler{
 		authService: authSrv,
-		userService: srvc,
+		//userService: srvc,
 	}
 }
 
@@ -46,7 +48,7 @@ func (h *UserHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 		respondError(w, http.StatusUnauthorized, "user not authentificated")
 		return
 	}
-	user, err := h.userService.GetProfile(r.Context(), userID)
+	user, err := h.authService.GetProfile(r.Context(), userID)
 	if err != nil {
 		respondError(w, http.StatusNotFound, "user not found")
 		return
@@ -80,10 +82,10 @@ func (h *UserHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.userService.UpdateProfile(r.Context(), userID, req, false)
-	if err != nil {
-		respondError(w, http.StatusNotFound, "Failed to update profile")
-		return
-	}
-	respondJSON(w, http.StatusOK, user)
+	// user, err := h.userService.UpdateProfile(r.Context(), userID, req, false)
+	// if err != nil {
+	// 	respondError(w, http.StatusNotFound, "Failed to update profile")
+	// 	return
+	// }
+	respondJSON(w, http.StatusOK, userID)
 }

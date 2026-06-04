@@ -1,8 +1,8 @@
 package http
 
 import (
+	"ecommers/internal/service/admin"
 	auth "ecommers/internal/service/auth"
-	userService "ecommers/internal/service/auth"
 	cart "ecommers/internal/service/cart"
 	"ecommers/internal/service/order"
 	"ecommers/internal/service/product"
@@ -14,11 +14,12 @@ import (
 
 // Router CFG
 type RouterConfig struct {
-	AuthService    auth.AuthService
-	UserService    userService.UserService
+	AuthService auth.AuthService
+	//UserService    userService.UserService
 	ProductService product.ProductService
 	CartService    cart.CartService
 	OrderService   order.OrderService
+	AdminService   admin.AdminService
 }
 
 // Create router
@@ -54,10 +55,11 @@ func NewRouter(config RouterConfig) *chi.Mux {
 			cartHandler := NewCartHandler(config.CartService)
 			cartHandler.RegisterRoutes(r)
 
-			// USERS
-			userHandler := NewUserHandler(config.UserService, config.AuthService)
-			userHandler.RegisterRoutes(r)
-
+			// // USERS
+			// userHandler := NewUserHandler(config.UserService, config.AuthService)
+			// userHandler.RegisterRoutes(r)
+			adminHandler := NewAdminHandler(config.AdminService)
+			adminHandler.RegisterRoutes(r)
 			// ORDERS
 			orderHandler := NewOrderHandler(config.OrderService)
 			orderHandler.OrderRoutes(r)

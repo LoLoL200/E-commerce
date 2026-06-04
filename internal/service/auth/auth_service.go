@@ -21,6 +21,7 @@ type TokenClaims struct {
 
 // SERVICE
 type AuthService interface {
+	GetProfile(ctx context.Context, id uuid.UUID) (*models.User, error)
 	Register(ctx context.Context, email, password string) (uuid.UUID, error)
 	Login(ctx context.Context, email, password string) (string, string, error)
 	Refresh(ctx context.Context, refreshToken string) (string, error)
@@ -29,6 +30,14 @@ type AuthService interface {
 type authService struct {
 	userRepo repository.UserRepository
 	secret   string
+}
+
+func (s *authService) GetProfile(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	user, err := s.userRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, utils.ErrUserNotfound
+	}
+	return user, nil
 }
 
 // REGISTER
@@ -66,6 +75,7 @@ func (a *authService) Register(ctx context.Context, email, password string) (uui
 func (a *authService) Login(ctx context.Context, email, password string) (string, string, error) {
 	user, err := a.userRepo.GetEmail(ctx, email)
 	if err != nil {
+		log.Printf("[AUTH] ❌ Ошибка репозитория при поиске email: %v", err)
 		return "", "", err
 	}
 	if user == nil {
@@ -73,16 +83,19 @@ func (a *authService) Login(ctx context.Context, email, password string) (string
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		log.Printf("[AUTH] ❌ Ошибка bcrypt (Пароль не подошел): %v", err)
 		return "", "", utils.ErrInvalidCredentials
 	}
 
 	access, err := a.generateAccessToken(user)
 	if err != nil {
+		log.Printf("[AUTH] ❌ Ошибка генерации access токена: %v", err)
 		return "", "", err
 	}
 
 	refresh, err := a.generateRefreshToken(user)
 	if err != nil {
+		log.Printf("[AUTH] ❌ Ошибка генерации refresh токена: %v", err)
 		return "", "", err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"ecommers/internal/db"
 	httpHandler "ecommers/internal/handler/http"
 	postgres "ecommers/internal/repository/postgres"
+	adminService "ecommers/internal/service/admin"
 	userService "ecommers/internal/service/auth"
 	cart "ecommers/internal/service/cart"
 	"ecommers/internal/service/order"
@@ -52,6 +53,7 @@ func main() {
 	log.Println("Database connection established")
 
 	// --- РЕПОЗИТОРИИ ---
+	adminRepo := postgres.NewAdminRepository(database)
 	userRepo := postgres.NewUserRepository(database)
 	productRepo := postgres.NewProductRepository(database)
 	cartRepo := postgres.NewCartRepository(database)
@@ -59,7 +61,9 @@ func main() {
 
 	// --- СЕРВИСЫ ---
 	authSrv := userService.NewAuthService(userRepo, jwtSecret)
-	userSvc := userService.NewService(userRepo)
+	adminSrv := adminService.NewService(adminRepo)
+
+	//userSvc := userService.NewService(userRepo)
 	productServic := product.NewService(productRepo)
 	cartSvc := cart.NewService(cartRepo)
 
@@ -68,8 +72,9 @@ func main() {
 
 	// --- РОУТЕР ---
 	router := httpHandler.NewRouter(httpHandler.RouterConfig{
-		AuthService:    authSrv,
-		UserService:    userSvc,
+		AuthService: authSrv,
+		//UserService:    userSvc,
+		AdminService:   adminSrv,
 		ProductService: productServic,
 		CartService:    cartSvc,
 		OrderService:   orderSvc, // 4. ОБЯЗАТЕЛЬНО ПЕРЕДАЙ ЕГО СЮДА

@@ -6,7 +6,7 @@ TRUNCATE TABLE cart_items, products, categories, users CASCADE;
 -- ============================================
 INSERT INTO users (id, email, password_hash, first_name, surname, role) VALUES
 ('11111111-1111-1111-1111-111111111111', 'admin@test.com',
- '$2a$12$RSqB324gojEE8ko/kOokdeJKfRcKkCSIk1Gzawz8XXitjS3ckBVvC',
+ '6de2b26471effaaf8b370de60971242bebd6122b30857746fd02ddfadd34b580',
  'Admin', 'User', 'admin'),
 ('22222222-2222-2222-2222-222222222222', 'user@test.com',
  '$2a$12$biw7/IAP4JCuTf8Njbvr8ONCCZkq2b8UWOPjqBwHOGtVdaR6YuCby',
