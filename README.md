@@ -2,60 +2,139 @@
 
 ## 📌 Project Description
 
-This is a simple educational e-commerce project that implements the core functionality of an online store: browsing products, adding items to a cart, placing orders, and user management.
-
-The project demonstrates a classic web application structure with separation between frontend and backend logic.
+The E-commerce project is a REST API application that implements the business logic.
 
 ---
 
 ## ⚙️ Main Features
+==============================================
 
 ### 👤 User Side:
 
-* Browse products (catalog)
-* Search and filter products
-* View product details
-* Add products to cart
-* Manage cart (update quantity, remove items)
-* User registration and login
-* Checkout process
-* User profile page
+*  REGISTER
+*  LOGIN
+*  UPDATE TOKEN
+*  LOGOUT
+==============================================
+### 🍏,🖥️,🎨,📱 Product Side:
 
-### 🛠 Admin Panel (if implemented):
+*  List Product
+*  Search Product
+*  Products by Category
+*  Dateils product
+==============================================
+### 🛒 Cart Side:
 
-* Manage products (create / edit / delete)
-* Manage orders
-* Manage users
+*  GET cart user
+*  Clear cart
+*  Add new product in cart
+*  Update quantity
+==============================================
+### 🛍️ Order Side:
+
+*  Create new order from cart
+*  List user orders
+*  Datail one order
+*  Cancel order
+==============================================
 
 ---
 
 ## 🧱 Technologies Used
 
-* HTML — page structure
-* CSS / Bootstrap — styling and responsiveness
-* JavaScript — interactivity
-* PHP — backend logic
-* MySQL — database
+* Golang - base all project
+* Docker - For a virtual server and testing
+* Swagger - For a Frontend Developer
+* PostgreSQL — database
 
 ---
 
 ## 📂 Project Structure (example)
 
 ```
-/css        — styles
-/js         — scripts
-/images     — images
-/includes   — reusable components
-/admin      — admin panel
-/database   — database logic
-
-index.php        — home page
-product.php      — product page
-cart.php         — cart
-checkout.php     — checkout
-login.php        — login
-signup.php       — registration
-profile.php      — user profile
+.
+├── cmd
+│   └── api
+│       └── main.go
+├── docker-compose.yml
+├── Dockerfile.dev
+├── go.mod
+├── go.sum
+├── internal
+│   ├── db
+│   │   └── postgres.go
+│   ├── domain
+│   │   ├── cart.go
+│   │   ├── order.go
+│   │   ├── product.go
+│   │   └── user.go
+│   ├── handler
+│   │   ├── http
+│   │   │   ├── auth_handler.go
+│   │   │   ├── cart_handler.go
+│   │   │   ├── middleware.go
+│   │   │   ├── order_handler.go
+│   │   │   ├── product_handler.go
+│   │   │   ├── router.go
+│   │   │   ├── user_handler.go
+│   │   │   └── utils.go
+│   │   └── middleware
+│   │       ├── product.go
+│   │       └── users.go
+│   ├── repository
+│   │   ├── mocks
+│   │   └── postgres
+│   │       ├── cart_repository.go
+│   │       ├── mocks
+│   │       │   ├── cart_mock.go
+│   │       │   └── order_mock.go
+│   │       ├── orders_repository.go
+│   │       ├── product_repository.go
+│   │       └── user_repository.go
+│   └── service
+│       ├── auth
+│       │   ├── auth_service.go
+│       │   ├── dto_user.go
+│       │   ├── mocks
+│       │   │   ├── auth_mocks.go
+│       │   │   └── mocks.go
+│       │   └── user_service.go
+│       ├── cart
+│       │   └── cart_service.go
+│       ├── order
+│       │   ├── mocks
+│       │   │   └── order_service_mock.go
+│       │   └── order_service.go
+│       └── product
+│           ├── dto_product.go
+│           └── product_service.go
+├── migrations
+│   ├── 000001_create_users_table.down.sql
+│   ├── 000001_create_users_table.up.sql
+│   ├── 000002_create_categories_table.down.sql
+│   ├── 000002_create_categories_table.up.sql
+│   ├── 000003_create_products_table.down.sql
+│   ├── 000003_create_products_table.up.sql
+│   ├── 000004_create_cart_items_table.down.sql
+│   ├── 000004_create_cart_items_table.up.sql
+│   ├── 000005_create_orders_tables.down.sql
+│   └── 000005_create_orders_tables.up.sql
+├── pkg
+│   └── utils
+│       └── errors.go
+├── README.md
+├── script
+│   └── seed.sql
+├── swager
+│   ├── swager_auth.yaml
+│   ├── swager_cart.yaml
+│   ├── swager_order.yaml
+│   └── swager_product.yaml
+├── test
+│   └── user_test.go
+└── tmp
+    ├── build-errors.log
+    └── main
 ```
 
 ---
@@ -73,9 +152,10 @@ cd E-commerce
 
 Install the following:
 
-* Apache or Nginx
-* PHP (version 7 or higher)
-* MySQL
+* Golang
+* Swager
+* Docker
+* PostgreSQL
 
 ### 3. Database setup
 
@@ -83,53 +163,11 @@ Install the following:
 * Import the `.sql` file (if provided in the project)
 * Configure database connection settings in the config file (host, username, password, database name)
 
-### 4. Run the project
 
-Place the project into your web server directory:
-
-```
-/var/www/html   (Linux)
-htdocs          (XAMPP)
-```
-
-Start your server and open in browser:
-
-```
-http://localhost/
-```
-
-Or run using PHP built-in server:
-
-```bash
-php -S localhost:8000
-```
-
----
-
-## 💻 Useful Commands
-
-### Git commands
-
-```bash
-git clone https://github.com/LoLoL200/E-commerce.git
-git pull
-git add .
-git commit -m "update"
-git push
-```
-
-### Run local server
-
-```bash
-php -S localhost:8000
-```
-
----
 
 ## 📦 Possible Improvements
-
+* ADMIN PANEL
 * Integrate payment systems (Stripe / PayPal)
-* Add REST API
 * Improve security (password hashing, SQL injection protection)
 * Optimize performance
 
