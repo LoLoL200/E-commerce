@@ -15,6 +15,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  LOGIN
 *  UPDATE TOKEN
 *  LOGOUT
+  
 ==============================================
 ### 🍏,🖥️,🎨,📱 Product Side:
 
@@ -22,6 +23,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  Search Product
 *  Products by Category
 *  Dateils product
+  
 ==============================================
 ### 🛒 Cart Side:
 
@@ -29,6 +31,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  Clear cart
 *  Add new product in cart
 *  Update quantity
+  
 ==============================================
 ### 🛍️ Order Side:
 
@@ -36,6 +39,16 @@ The E-commerce project is a REST API application that implements the business lo
 *  List user orders
 *  Datail one order
 *  Cancel order
+  
+==============================================
+
+### 🧑‍💻 ADMIN Side:
+
+*  Create Product
+*  Delete Product
+*  Get Orders
+*  Delete User
+  
 ==============================================
 
 ---
@@ -64,12 +77,14 @@ The E-commerce project is a REST API application that implements the business lo
 │   ├── db
 │   │   └── postgres.go
 │   ├── domain
+│   │   ├── admin.go
 │   │   ├── cart.go
 │   │   ├── order.go
 │   │   ├── product.go
 │   │   └── user.go
 │   ├── handler
 │   │   ├── http
+│   │   │   ├── admin_handler.go
 │   │   │   ├── auth_handler.go
 │   │   │   ├── cart_handler.go
 │   │   │   ├── middleware.go
@@ -84,6 +99,7 @@ The E-commerce project is a REST API application that implements the business lo
 │   ├── repository
 │   │   ├── mocks
 │   │   └── postgres
+│   │       ├── admin_repository.go
 │   │       ├── cart_repository.go
 │   │       ├── mocks
 │   │       │   ├── cart_mock.go
@@ -92,6 +108,8 @@ The E-commerce project is a REST API application that implements the business lo
 │   │       ├── product_repository.go
 │   │       └── user_repository.go
 │   └── service
+│       ├── admin
+│       │   └── admin_service.go
 │       ├── auth
 │       │   ├── auth_service.go
 │       │   ├── dto_user.go
@@ -121,20 +139,25 @@ The E-commerce project is a REST API application that implements the business lo
 │   └── 000005_create_orders_tables.up.sql
 ├── pkg
 │   └── utils
+│       ├── admin_check.go
 │       └── errors.go
 ├── README.md
 ├── script
 │   └── seed.sql
 ├── swager
+│   ├──  swager_admin.yaml
 │   ├── swager_auth.yaml
 │   ├── swager_cart.yaml
 │   ├── swager_order.yaml
 │   └── swager_product.yaml
 ├── test
 │   └── user_test.go
+├── test_bin
 └── tmp
     ├── build-errors.log
     └── main
+
+ 
 ```
 
 ---
@@ -166,7 +189,7 @@ Install the following:
 
 
 ## 📦 Possible Improvements
-* ADMIN PANEL
+* ADMIN PANEL(new function)
 * Integrate payment systems (Stripe / PayPal)
 * Improve security (password hashing, SQL injection protection)
 * Optimize performance
