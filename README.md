@@ -77,12 +77,14 @@ The E-commerce project is a REST API application that implements the business lo
 │   ├── db
 │   │   └── postgres.go
 │   ├── domain
+│   │   ├── admin.go
 │   │   ├── cart.go
 │   │   ├── order.go
 │   │   ├── product.go
 │   │   └── user.go
 │   ├── handler
 │   │   ├── http
+│   │   │   ├── admin_handler.go
 │   │   │   ├── auth_handler.go
 │   │   │   ├── cart_handler.go
 │   │   │   ├── middleware.go
@@ -97,6 +99,7 @@ The E-commerce project is a REST API application that implements the business lo
 │   ├── repository
 │   │   ├── mocks
 │   │   └── postgres
+│   │       ├── admin_repository.go
 │   │       ├── cart_repository.go
 │   │       ├── mocks
 │   │       │   ├── cart_mock.go
@@ -105,6 +108,8 @@ The E-commerce project is a REST API application that implements the business lo
 │   │       ├── product_repository.go
 │   │       └── user_repository.go
 │   └── service
+│       ├── admin
+│       │   └── admin_service.go
 │       ├── auth
 │       │   ├── auth_service.go
 │       │   ├── dto_user.go
@@ -134,20 +139,25 @@ The E-commerce project is a REST API application that implements the business lo
 │   └── 000005_create_orders_tables.up.sql
 ├── pkg
 │   └── utils
+│       ├── admin_check.go
 │       └── errors.go
 ├── README.md
 ├── script
 │   └── seed.sql
 ├── swager
+│   ├──  swager_admin.yaml
 │   ├── swager_auth.yaml
 │   ├── swager_cart.yaml
 │   ├── swager_order.yaml
 │   └── swager_product.yaml
 ├── test
 │   └── user_test.go
+├── test_bin
 └── tmp
     ├── build-errors.log
     └── main
+
+ 
 ```
 
 ---
