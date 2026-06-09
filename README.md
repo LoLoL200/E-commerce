@@ -15,6 +15,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  LOGIN
 *  UPDATE TOKEN
 *  LOGOUT
+  
 ==============================================
 ### 🍏,🖥️,🎨,📱 Product Side:
 
@@ -22,6 +23,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  Search Product
 *  Products by Category
 *  Dateils product
+  
 ==============================================
 ### 🛒 Cart Side:
 
@@ -29,6 +31,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  Clear cart
 *  Add new product in cart
 *  Update quantity
+  
 ==============================================
 ### 🛍️ Order Side:
 
@@ -36,6 +39,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  List user orders
 *  Datail one order
 *  Cancel order
+  
 ==============================================
 
 ### 🧑‍💻 ADMIN Side:
@@ -44,6 +48,7 @@ The E-commerce project is a REST API application that implements the business lo
 *  Delete Product
 *  Get Orders
 *  Delete User
+  
 ==============================================
 
 ---
