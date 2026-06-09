@@ -38,6 +38,14 @@ The E-commerce project is a REST API application that implements the business lo
 *  Cancel order
 ==============================================
 
+### 🧑‍💻 ADMIN Side:
+
+*  Create Product
+*  Delete Product
+*  Get Orders
+*  Delete User
+==============================================
+
 ---
 
 ## 🧱 Technologies Used
@@ -166,7 +174,7 @@ Install the following:
 
 
 ## 📦 Possible Improvements
-* ADMIN PANEL
+* ADMIN PANEL(new function)
 * Integrate payment systems (Stripe / PayPal)
 * Improve security (password hashing, SQL injection protection)
 * Optimize performance
